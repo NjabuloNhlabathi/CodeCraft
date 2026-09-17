@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Refreshes the page every 2 seconds to update data -->
+    <meta http-equiv="refresh" content="2">
+</head>
+<body>
+    <div class="box">
+        <h2>Live Sensor Monitor</h2>
+        <p><strong>Distance:</strong> {{ distance }}</p>
+        <p><strong>Gas Level:</strong> {{ gas }}</p>
+    </div>
+</body>
+</html>
