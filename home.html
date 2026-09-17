@@ -1,0 +1,119 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Arduino Monitoring Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>Arduino Monitoring System</h1>
+                <p>Real-time sensor information</p>
+            </div>
+
+            <div class="status">
+                <span class="dot"></span>
+                SYSTEM ONLINE
+            </div>
+        </header>
+
+
+        <!-- Sensor Cards -->
+        <section class="cards">
+
+            <div class="card">
+                <h3>Distance</h3>
+                <p class="value" id="distance">25 cm</p>
+                <span>Ultrasonic Sensor</span>
+            </div>
+
+            <div class="card">
+                <h3>Temperature</h3>
+                <p class="value" id="temperature">24.5 °C</p>
+                <span>Temperature Sensor</span>
+            </div>
+
+            <div class="card">
+                <h3>Water Quality</h3>
+                <p class="value good" id="water">GOOD</p>
+                <span>Water Sensor</span>
+            </div>
+
+            <div class="card">
+                <h3>Motion</h3>
+                <p class="value" id="motion">DETECTED</p>
+                <span>PIR Sensor</span>
+            </div>
+
+        </section>
+
+
+        <!-- Sensor Information -->
+        <section class="panel">
+
+            <h2>Sensor Readings</h2>
+
+            <div class="reading">
+                <span>Distance</span>
+                <strong id="distance2">25 cm</strong>
+            </div>
+
+            <div class="reading">
+                <span>Temperature</span>
+                <strong id="temperature2">24.5 °C</strong>
+            </div>
+
+            <div class="reading">
+                <span>Water Quality</span>
+                <strong id="water2">Good</strong>
+            </div>
+
+            <div class="reading">
+                <span>Motion Status</span>
+                <strong id="motion2">Detected</strong>
+            </div>
+
+        </section>
+
+
+        <!-- Alert Section -->
+        <section class="alert">
+
+            <h2>Alerts</h2>
+
+            <p id="alertMessage">
+                ⚠ Motion detected near monitored area
+            </p>
+
+        </section>
+
+
+        <!-- Controls -->
+        <section class="controls">
+
+            <h2>Arduino Controls</h2>
+
+            <button onclick="turnLEDOn()">Turn LED ON</button>
+            <button onclick="turnLEDOff()">Turn LED OFF</button>
+
+            <p id="ledStatus">LED Status: OFF</p>
+
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+```
