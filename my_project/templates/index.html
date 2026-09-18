@@ -1,16 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sensor Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sensor Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Refreshes the page every 2 seconds to update data -->
     <meta http-equiv="refresh" content="2">
+    <style>
+        :root {
+            --ink: #17212b;
+            --muted: #667481;
+            --line: #dce5e8;
+            --surface: #ffffff;
+            --background: #eef5f3;
+            --teal: #087f73;
+            --teal-dark: #07554f;
+            --blue: #2878a8;
+            --amber: #267900;
+            --red: #c34b45;
+            --shadow: 0 18px 45px rgba(23, 65, 68, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 32px 20px;
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            background: linear-gradient(135deg, #f7fbfa 0%, var(--background) 48%, #dceceb 100%);
+        }
+
+        .dashboard { max-width: 1120px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 18px 4px 30px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: var(--teal);
+            font: 700 0.75rem/1.2 Arial, sans-serif;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.98; }
+
+        .header-note {
+            max-width: 235px;
+            margin: 0;
+            color: var(--muted);
+            font: 0.9rem/1.5 Arial, sans-serif;
+            text-align: right;
+        }
+
+        main { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            grid-column: span 4;
+            min-height: 225px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: var(--shadow);
+            animation: rise 0.55s ease both;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.08s; }
+        .card:nth-child(3) { animation-delay: 0.16s; }
+        .card:nth-child(4) { animation-delay: 0.24s; }
+
+        .card::after {
+            position: absolute;
+            right: -32px;
+            bottom: -44px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(8, 127, 115, 0.08);
+            content: "";
+        }
+
+        .card h2 { margin: 0 0 25px; font-size: 1.25rem; }
+        .card h2::before { display: block; width: 34px; height: 3px; margin-bottom: 14px; background: var(--teal); content: ""; }
+        .reading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); font: 0.9rem Arial, sans-serif; }
+        .reading:last-child { border-bottom: 0; }
+        .reading strong { color: var(--muted); font-weight: 600; }
+        .reading span { color: var(--ink); font-size: 1.05rem; font-weight: 700; text-align: right; }
+        .temperature span { color: var(--amber); }
+        .location span { color: var(--blue); }
+        .water { grid-column: span 6; border-top: 4px solid var(--blue); }
+        .water h2::before { background: var(--blue); }
+        .empty { color: var(--red) !important; }
+
+        footer { padding: 28px 4px 0; color: var(--muted); font: 0.78rem Arial, sans-serif; text-align: center; }
+
+        @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 760px) {
+            body { padding: 18px 14px; }
+            header { display: block; padding-bottom: 24px; }
+            .header-note { margin-top: 14px; text-align: left; }
+            .card, .water { grid-column: 1 / -1; min-height: auto; }
+        }
+    </style>
 </head>
 <body>
-    <div class="box">
-        <h2>Live Sensor Monitor</h2>
-        <p><strong>Distance:</strong> {{ distance }}</p>
-        <p><strong>Gas Level:</strong> {{ gas }}</p>
+    <div class="dashboard">
+        <header>
+            <div>
+                <p class="eyebrow">Environmental monitoring</p>
+                <h1>Smart Sensor<br>Dashboard</h1>
+            </div>
+            <p class="header-note">Live readings from the connected prototype, refreshed every two seconds.</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>Sensor readings</h2>
+                <div class="reading"><strong>Distance</strong><span>{{ distance }}</span></div>
+                <div class="reading"><strong>Gas level</strong><span>{{ gas }} ppm</span></div>
+            </section>
+
+            <section class="card temperature">
+                <h2>Battery Health</h2>
+                <div class="reading"><strong>Motor BATTERY </strong><span class = "value">78%
+                </span></div>
+                <div class="reading"><strong>PSU status</strong><span class = "low">85%</span></div>
+            </section>
+
+            <section class="card location">
+                <h2>Location</h2>
+                <div class="reading"><strong>Coordinates</strong><span id="coords">Loading...</span></div>
+                <div class="reading"><strong>Altitude</strong><span id="altitude">Loading...</span></div>
+            </section>
+
+            <section class="card water">
+                <h2>Water chamber</h2>
+                <div class="reading"><strong>Status</strong><span class="empty">EMPTY</span></div>
+                <div class="reading"><strong>Maximum capacity</strong><span>{{ water_capacity }} 200 ml</span></div>
+                <div class="reading"><strong>Currently filled</strong><span>{{ water_filled }} 0/200 ml</span></div>
+            </section>
+        </main>
+
+        <footer>Powered by IoT sensors | Updated every 2 seconds</footer>
     </div>
+
+    <!-- Internal JavaScript -->
+    <script>
+        // Update location and altitude
+        function updateLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(5);
+                        const lon = position.coords.longitude.toFixed(5);
+                        const alt = position.coords.altitude;
+
+                        document.getElementById("coords").textContent = `${lat}, ${lon}`;
+
+                        if (alt !== null) {
+                            document.getElementById("altitude").textContent = `${alt.toFixed(2)} m above sea level`;
+                        } else {
+                            document.getElementById("altitude").textContent = "Altitude not available";
+                        }
+                    },
+                    () => {
+                        document.getElementById("coords").textContent = "Unable to fetch location";
+                        document.getElementById("altitude").textContent = "N/A";
+                    }
+                );
+            } else {
+                document.getElementById("coords").textContent = "Geolocation not supported";
+                document.getElementById("altitude").textContent = "N/A";
+            }
+        }
+
+        // Refresh location every 5 seconds
+        setInterval(updateLocation, 5000);
+        updateLocation();
+    </script>
 </body>
 </html>
