@@ -1,15 +1,15 @@
-from flask import Flask, render_template
-import serial
-
-app = Flask(__name__)
-
 import threading
 import time
+
 import serial
+from flask import Flask, render_template
+
+app = Flask(__name__)
 
 # Global variables to store the latest sensor data
 latest_distance = 'Waiting for connection...'
 latest_gas = 'Waiting for connection...'
+serial_port = 'COM3'
 
 def read_serial():
     global latest_distance, latest_gas
@@ -18,14 +18,19 @@ def read_serial():
     while True:
         # If not connected, try to connect
         if ser is None or not ser.is_open:
-            latest_distance = 'COM Port Blocked/Disconnected'
-            latest_gas = 'COM Port Blocked/Disconnected'
+            latest_distance = f'{serial_port} disconnected'
+            latest_gas = f'{serial_port} disconnected'
             try:
-                ser = serial.Serial('COM3', 9600, timeout=1)
-                print("Successfully connected to COM3")
+                ser = serial.Serial(serial_port, 9600, timeout=1)
+                print(f"Successfully connected to {serial_port}")
                 latest_distance = 'Connected! Waiting for data...'
                 latest_gas = 'Connected! Waiting for data...'
-            except serial.SerialException:
+            except serial.SerialException as error:
+                if 'Access is denied' in str(error):
+                    status = f'{serial_port} is in use - close Serial Monitor'
+                    latest_distance = status
+                    latest_gas = status
+                print(f"Unable to connect to {serial_port}: {error}")
                 time.sleep(2) # Wait before retrying
                 continue
 
@@ -40,9 +45,10 @@ def read_serial():
                         latest_gas = parts[1].replace('Gas Level:', '').strip()
             else:
                 time.sleep(0.1) # Small sleep to prevent CPU hogging
-        except Exception as e:
-            print(f"Serial error/disconnected: {e}")
-            ser.close()
+        except (serial.SerialException, OSError) as error:
+            print(f"Serial error/disconnected: {error}")
+            if ser is not None and ser.is_open:
+                ser.close()
             ser = None
 
 # Start the background thread for reading serial data
