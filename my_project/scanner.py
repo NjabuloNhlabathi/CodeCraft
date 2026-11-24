@@ -35,7 +35,7 @@ while True:
 
     # If the visibility score drops too low, the water is too murky
     if murkiness_score < 80: 
-        system_status = "HIGH TURBIDITY (MURKY)"
+        system_status = "LOW VISIBILTY (SLOWING DOWN)"
         status_color = (0, 165, 255) # Orange Warning
         
     # Draw boxes around the detected foreign materials
